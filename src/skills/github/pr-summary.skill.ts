@@ -15,25 +15,27 @@ export class PrSummarySkill implements ISkill, OnModuleInit {
       'summarize PR 42 on acme/widgets',
       'what does pull request 7 on owner/repo do',
       'give me a summary of PR 123 on myorg/myrepo',
+      'summarize my latest pull request',
+      'what was the last PR',
     ],
     parameters: [
       {
         name: 'owner',
         type: 'string',
-        description: 'GitHub repository owner',
-        required: true,
+        description: 'GitHub repository owner (optional — omit for auto-detect)',
+        required: false,
       },
       {
         name: 'repo',
         type: 'string',
-        description: 'GitHub repository name',
-        required: true,
+        description: 'GitHub repository name (optional — omit for auto-detect)',
+        required: false,
       },
       {
         name: 'pullNumber',
         type: 'number',
-        description: 'Pull request number',
-        required: true,
+        description: 'Pull request number (optional — omit or use 0 for latest)',
+        required: false,
       },
     ],
   };
@@ -49,16 +51,25 @@ export class PrSummarySkill implements ISkill, OnModuleInit {
   }
 
   async execute(params: Record<string, unknown>): Promise<SkillResult> {
-    const owner = params.owner as string;
-    const repo = params.repo as string;
-    const pullNumber = Number(params.pullNumber);
+    let owner = params.owner as string | undefined;
+    let repo = params.repo as string | undefined;
+    let pullNumber = Number(params.pullNumber) || 0;
 
+    // If missing owner/repo/pullNumber, auto-detect the latest PR
     if (!owner || !repo || !pullNumber) {
-      return {
-        success: false,
-        spokenResponse:
-          'I need a repository owner, name, and pull request number. For example: summarize PR 42 on acme/widgets.',
-      };
+      this.logger.debug('Missing params — looking up latest PR automatically');
+      const latest = await this.github.getLatestPullRequest(owner, repo);
+      if (!latest) {
+        return {
+          success: false,
+          spokenResponse:
+            "I couldn't find any pull requests on your accessible repositories.",
+        };
+      }
+      owner = latest.owner;
+      repo = latest.repo;
+      pullNumber = latest.pullNumber;
+      this.logger.debug(`Auto-detected latest PR: ${owner}/${repo}#${pullNumber}`);
     }
 
     this.logger.debug(`Summarizing ${owner}/${repo}#${pullNumber}`);
@@ -66,7 +77,7 @@ export class PrSummarySkill implements ISkill, OnModuleInit {
     try {
       const pr = await this.github.getPullRequest(owner, repo, pullNumber);
 
-      const prompt = `Summarize this GitHub pull request concisely for a spoken response (2-4 sentences max).
+      const prompt = `Summarize this GitHub pull request for a spoken response.
 
 PR: ${owner}/${repo}#${pullNumber}
 Title: ${pr.title}
@@ -82,16 +93,17 @@ ${pr.diff}
 
 ${pr.comments.length > 0 ? `Comments:\n${pr.comments.join('\n')}` : ''}
 
-Provide a natural spoken summary covering:
-1. What the PR does (one sentence)
-2. Key changes (one sentence)
-3. Any concerns or notable items (if any)
+Provide a thorough spoken summary covering:
+1. What the PR does and why (1-2 sentences)
+2. Key files and changes in detail (2-3 sentences)
+3. Code quality observations or potential concerns (1-2 sentences)
+4. Overall assessment (1 sentence)
 
-Keep it conversational — this will be read aloud by a voice assistant.`;
+Keep it conversational and natural — this will be read aloud by a voice assistant. Aim for about 6-8 sentences total.`;
 
       const summary = await this.llm.chat('analysis', {
         messages: [{ role: 'user', content: prompt }],
-        maxTokens: 512,
+        maxTokens: 1024,
         temperature: 0.3,
       });
 

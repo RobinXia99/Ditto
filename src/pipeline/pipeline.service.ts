@@ -43,7 +43,8 @@ export class PipelineService implements OnModuleInit {
     try {
       // 1. Transcribe
       const text = await this.whisper.transcribe(event.audioBuffer);
-      if (!text || text.trim().length === 0) {
+      const isBlank = !text || text.trim().length === 0 || /^\[.*AUDIO.*\]$/i.test(text.trim());
+      if (isBlank) {
         this.logger.warn('Empty transcription — resuming listening');
         await this.tts.speak("I didn't catch that. Could you say it again?");
         this.eventEmitter.emit(PipelineEvents.RESPONSE_SPOKEN);

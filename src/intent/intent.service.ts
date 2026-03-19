@@ -53,7 +53,9 @@ Rules:
         temperature: 0,
       });
 
-      const parsed = JSON.parse(response);
+      // Strip markdown code fences that some LLMs wrap around JSON
+      const cleaned = response.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '');
+      const parsed = JSON.parse(cleaned);
 
       if (parsed.skillKey === 'none' || parsed.confidence < 0.3) {
         return {

@@ -11,7 +11,7 @@ export class MacOSSayProvider {
   async speak(text: string): Promise<void> {
     this.logger.debug(`Speaking via macOS say: "${text.substring(0, 50)}..."`);
     try {
-      await execFileAsync('say', ['-v', 'Samantha', text]);
+      await execFileAsync('say', ['-v', 'Karen', text]);
     } catch (err) {
       this.logger.error(`macOS say failed: ${err}`);
       throw err;

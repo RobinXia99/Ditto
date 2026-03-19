@@ -52,14 +52,17 @@ export class RecorderService {
       return this.stopAndReturn();
     }
 
-    // Energy-based silence detection
+    // Energy-based silence detection — skip for first 2s to let user start speaking
     const energy = this.calculateEnergy(chunk);
+    if (elapsed < 2000) {
+      return null;
+    }
     if (energy < this.silenceThreshold) {
       if (!this.silenceStart) {
         this.silenceStart = Date.now();
       } else if (Date.now() - this.silenceStart >= this.silenceDurationMs) {
         this.logger.debug(
-          `Silence detected after ${elapsed}ms of recording`,
+          `Silence detected after ${elapsed}ms of recording (energy: ${Math.round(energy)})`,
         );
         return this.stopAndReturn();
       }

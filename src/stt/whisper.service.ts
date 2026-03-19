@@ -1,18 +1,29 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+
+const execFileAsync = promisify(execFile);
 
 @Injectable()
 export class WhisperService {
   private readonly logger = new Logger(WhisperService.name);
   private readonly modelPath: string;
+  private readonly whisperBin: string;
 
   constructor(private readonly configService: ConfigService) {
     this.modelPath = this.configService.get<string>(
       'whisper.modelPath',
       './models/ggml-base.en.bin',
+    );
+
+    // Resolve the whisper.cpp binary path
+    this.whisperBin = path.resolve(
+      __dirname,
+      '../../node_modules/.pnpm/whisper-node@1.1.1/node_modules/whisper-node/lib/whisper.cpp/main',
     );
   }
 
@@ -21,7 +32,6 @@ export class WhisperService {
       `Transcribing ${audioBuffer.length} bytes of audio...`,
     );
 
-    // Write raw PCM to a temporary WAV file (whisper-node expects a file path)
     const tmpPath = path.join(
       os.tmpdir(),
       `ditto-${Date.now()}.wav`,
@@ -31,31 +41,25 @@ export class WhisperService {
       const wavBuffer = this.pcmToWav(audioBuffer, 16000, 1, 16);
       fs.writeFileSync(tmpPath, wavBuffer);
 
-      const whisper = await import('whisper-node');
-      const whisperFn = whisper.default as typeof whisper.default;
+      const { stdout } = await execFileAsync(this.whisperBin, [
+        '-m', this.modelPath,
+        '-f', tmpPath,
+        '-l', 'en',
+        '--no-timestamps',
+      ], { timeout: 15000 });
 
-      const result = await whisperFn(tmpPath, {
-        modelName: this.modelPath,
-        whisperOptions: {
-          language: 'en',
-          word_timestamps: false,
-        },
-      });
+      const text = stdout
+        .replace(/\[.*?\]/g, '') // strip any remaining timestamp brackets
+        .trim();
 
-      if (!result || result.length === 0) {
+      if (!text) {
         this.logger.warn('Whisper returned empty transcription');
         return '';
       }
 
-      const text = result
-        .map((segment: { speech: string }) => segment.speech)
-        .join(' ')
-        .trim();
-
       this.logger.debug(`Transcription: "${text}"`);
       return text;
     } finally {
-      // Clean up temp file
       try {
         fs.unlinkSync(tmpPath);
       } catch {
@@ -83,8 +87,8 @@ export class WhisperService {
 
     // fmt sub-chunk
     buffer.write('fmt ', 12);
-    buffer.writeUInt32LE(16, 16); // sub-chunk size
-    buffer.writeUInt16LE(1, 20); // PCM format
+    buffer.writeUInt32LE(16, 16);
+    buffer.writeUInt16LE(1, 20);
     buffer.writeUInt16LE(channels, 22);
     buffer.writeUInt32LE(sampleRate, 24);
     buffer.writeUInt32LE(byteRate, 28);

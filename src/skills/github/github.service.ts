@@ -30,6 +30,56 @@ export class GitHubService implements OnModuleInit {
     this.logger.log('GitHub client initialized');
   }
 
+  async getAccessibleRepos(): Promise<{ owner: string; repo: string }[]> {
+    const repos = await this.octokit.repos.listForAuthenticatedUser({
+      sort: 'pushed',
+      per_page: 10,
+    });
+    return repos.data.map((r) => ({
+      owner: r.owner.login,
+      repo: r.name,
+    }));
+  }
+
+  async getLatestPullRequest(
+    owner?: string,
+    repo?: string,
+  ): Promise<{ owner: string; repo: string; pullNumber: number } | null> {
+    // If no owner/repo specified, find the first repo with a PR
+    if (!owner || !repo) {
+      const repos = await this.getAccessibleRepos();
+      for (const r of repos) {
+        const prs = await this.octokit.pulls.list({
+          owner: r.owner,
+          repo: r.repo,
+          state: 'all',
+          sort: 'created',
+          direction: 'desc',
+          per_page: 1,
+        });
+        if (prs.data.length > 0) {
+          return {
+            owner: r.owner,
+            repo: r.repo,
+            pullNumber: prs.data[0].number,
+          };
+        }
+      }
+      return null;
+    }
+
+    const prs = await this.octokit.pulls.list({
+      owner,
+      repo,
+      state: 'all',
+      sort: 'created',
+      direction: 'desc',
+      per_page: 1,
+    });
+    if (prs.data.length === 0) return null;
+    return { owner, repo, pullNumber: prs.data[0].number };
+  }
+
   async getPullRequest(
     owner: string,
     repo: string,
