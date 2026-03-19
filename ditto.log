@@ -1,0 +1,68 @@
+
+> ditto@0.1.0 start /Users/robin/Desktop/personal/Ditto
+> nest start
+
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +11ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mSkillsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mDiscoveryModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mEventEmitterModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mSecretsModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mSttModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[TtsService] [39m[32mTTS engine: macos-say[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTtsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mLlmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAudioModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mGitHubSkillModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mChatSkillModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mSlackSkillModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mIntentModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPipelineModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[SkillRegistryService] [39m[32mSkill registered: github.pr.summary[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[GitHubService] [39m[32mGitHub client initialized[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[SkillRegistryService] [39m[32mSkill registered: chat.ask[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[SkillRegistryService] [39m[32mSkill registered: slack.dm[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[SlackService] [39m[32mSlack client initialized[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[SlackService] [39m[32mCached 20 Slack users[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[WakeWordService] [39m[32mWake word detection ready (keyword: "porcupine", frame: 512)[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[SecretsService] [39m[32mKeytar loaded — using OS keychain for secrets[39m
+[33m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [33m   WARN[39m [38;5;3m[ClaudeProvider] [39m[33mANTHROPIC_API_KEY not set — Claude provider unavailable[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[GeminiProvider] [39m[32mGemini provider ready[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[LlmService] [39m[32mLLM intent: gemini/gemini-2.5-flash[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[LlmService] [39m[32mLLM analysis: gemini/gemini-2.5-flash[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[PipelineService] [39m[32mPipeline service initialized[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[PipelineService] [39m[32mStarting Ditto pipeline...[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[AudioPipelineService] [39m[32mAudio pipeline starting...[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [95m  DEBUG[39m [38;5;3m[MicrophoneService] [39m[95mMicrophone started at 16000Hz[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [95m  DEBUG[39m [38;5;3m[AudioPipelineService] [39m[95mState: LISTENING → LISTENING[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:03 AM [32m    LOG[39m [38;5;3m[PipelineService] [39m[32m🎤 Ditto is listening...[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:04 AM [32m    LOG[39m [38;5;3m[WakeWordService] [39m[32mWake word detected![39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:04 AM [95m  DEBUG[39m [38;5;3m[AudioPipelineService] [39m[95mState: LISTENING → RECORDING[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:04 AM [95m  DEBUG[39m [38;5;3m[WakeWordService] [39m[95mWake word detection paused[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:04 AM [95m  DEBUG[39m [38;5;3m[RecorderService] [39m[95mRecording started[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:11 AM [95m  DEBUG[39m [38;5;3m[RecorderService] [39m[95mSilence detected after 6399ms of recording (energy: 63)[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:11 AM [95m  DEBUG[39m [38;5;3m[RecorderService] [39m[95mRecording complete: 204800 bytes, 6399ms[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:11 AM [95m  DEBUG[39m [38;5;3m[AudioPipelineService] [39m[95mState: RECORDING → PROCESSING[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:11 AM [95m  DEBUG[39m [38;5;3m[PipelineService] [39m[95mSpeech captured: 204800 bytes, 6400ms[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:11 AM [95m  DEBUG[39m [38;5;3m[WhisperService] [39m[95mTranscribing 204800 bytes of audio...[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:12 AM [95m  DEBUG[39m [38;5;3m[WhisperService] [39m[95mTranscription: "DM Andreas, that is a traitor."[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:12 AM [32m    LOG[39m [38;5;3m[PipelineService] [39m[32mTranscription: "DM Andreas, that is a traitor."[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:12 AM [95m  DEBUG[39m [38;5;3m[IntentService] [39m[95mParsing intent from: "DM Andreas, that is a traitor."[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:13 AM [95m  DEBUG[39m [38;5;3m[LlmService] [39m[95m[intent] gemini/gemini-2.5-flash — in: 709, out: 57 | session total in: 709, out: 57[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:13 AM [95m  DEBUG[39m [38;5;3m[IntentService] [39m[95mIntent: slack.dm (confidence: 0.95)[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:13 AM [32m    LOG[39m [38;5;3m[PipelineService] [39m[32mIntent: slack.dm (confidence: 0.95)[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:13 AM [95m  DEBUG[39m [38;5;3m[AudioPipelineService] [39m[95mState: PROCESSING → PROCESSING[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:13 AM [95m  DEBUG[39m [38;5;3m[SkillRunnerService] [39m[95mExecuting skill: slack.dm with params: {"recipient":"Andreas","message":"that is a traitor","rawTranscription":"DM Andreas, that is a traitor."}[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:13 AM [95m  DEBUG[39m [38;5;3m[SlackDmSkill] [39m[95mSlack DM to "Andreas": "that is a traitor"[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:13 AM [95m  DEBUG[39m [38;5;3m[SlackDmSkill] [39m[95mComposing message for Andreas: "DM Andreas, that is a traitor."[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:15 AM [95m  DEBUG[39m [38;5;3m[LlmService] [39m[95m[analysis] gemini/gemini-2.5-flash — in: 210, out: 10 | session total in: 919, out: 67[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:15 AM [95m  DEBUG[39m [38;5;3m[SlackDmSkill] [39m[95mFinal message: "Hey Andreas, you're such a traitor!"[39m
+[32m[Nest] 30154  - [39m03/19/2026, 11:48:16 AM [32m    LOG[39m [38;5;3m[PipelineService] [39m[32mSkill result (slack.dm): success=true[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:16 AM [95m  DEBUG[39m [38;5;3m[AudioPipelineService] [39m[95mState: PROCESSING → SPEAKING[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:16 AM [95m  DEBUG[39m [38;5;3m[MacOSSayProvider] [39m[95mSpeaking via macOS say: "Done. I sent Andreas a message on Slack...."[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:19 AM [95m  DEBUG[39m [38;5;3m[WakeWordService] [39m[95mWake word detection resumed[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:19 AM [95m  DEBUG[39m [38;5;3m[AudioPipelineService] [39m[95mState: SPEAKING → LISTENING[39m
+[95m[Nest] 30154  - [39m03/19/2026, 11:48:19 AM [95m  DEBUG[39m [38;5;3m[AudioPipelineService] [39m[95mResumed listening for wake word[39m

@@ -83,7 +83,7 @@ export class PipelineService implements OnModuleInit {
       this.audioPipeline.setState(PipelineState.PROCESSING);
       const skillResult = await this.skillRunner.execute(
         result.intent.skillKey,
-        result.intent.parameters,
+        { ...result.intent.parameters, rawTranscription: text },
       );
 
       this.logger.log(
