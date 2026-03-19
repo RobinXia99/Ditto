@@ -1,0 +1,37 @@
+{
+  "name": "ditto",
+  "version": "0.1.0",
+  "description": "Local voice-controlled AI developer assistant",
+  "private": true,
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "setup": "ts-node src/setup.ts",
+    "lint": "eslint \"{src,test}/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@google/genai": "^1.45.0",
+    "@nestjs/common": "^10.4.0",
+    "@nestjs/config": "^3.3.0",
+    "@nestjs/core": "^10.4.0",
+    "@nestjs/event-emitter": "^2.1.0",
+    "@octokit/rest": "^21.0.0",
+    "@picovoice/porcupine-node": "^3.0.0",
+    "joi": "^17.13.0",
+    "keytar": "^7.9.0",
+    "node-record-lpcm16": "^1.0.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "whisper-node": "^1.1.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.0",
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.0"
+  }
+}

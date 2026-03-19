@@ -1,0 +1,169 @@
+ Plan to implement                                                                                                                                             │
+│                                                                                                                                                               │
+│ Ditto Phase 1 — Implementation Plan                                                                                                                           │
+│                                                                                                                                                               │
+│ Context                                                                                                                                                       │
+│                                                                                                                                                               │
+│ Ditto is a local voice-controlled AI developer assistant. Phase 1 delivers the core prototype: wake word detection → speech-to-text → command parsing →       │
+│ GitHub PR summary → spoken response. All audio processing is local (no data to OpenAI). Claude (Anthropic) is the only cloud AI used.                         │
+│                                                                                                                                                               │
+│ Tech Stack                                                                                                                                                    │
+│                                                                                                                                                               │
+│ ┌───────────────┬────────────────────────────────────────┬──────────────────────────────────────────────────┐                                                 │
+│ │   Component   │                  Tool                  │                       Why                        │                                                 │
+│ ├───────────────┼────────────────────────────────────────┼──────────────────────────────────────────────────┤                                                 │
+│ │ Framework     │ NestJS (standalone, no HTTP)           │ Modular, DI, event-driven, scales for Phases 2-5 │                                                 │
+│ ├───────────────┼────────────────────────────────────────┼──────────────────────────────────────────────────┤                                                 │
+│ │ Wake word     │ @picovoice/porcupine-node              │ Local, low-latency, Node SDK                     │                                                 │
+│ ├───────────────┼────────────────────────────────────────┼──────────────────────────────────────────────────┤                                                 │
+│ │ STT           │ whisper-node (whisper.cpp bindings)    │ Local Whisper, no cloud, high accuracy           │                                                 │
+│ ├───────────────┼────────────────────────────────────────┼──────────────────────────────────────────────────┤                                                 │
+│ │ TTS           │ Piper TTS (local) + macOS say fallback │ Local, good quality                              │                                                 │
+│ ├───────────────┼────────────────────────────────────────┼──────────────────────────────────────────────────┤                                                 │
+│ │ AI Brain      │ @anthropic-ai/sdk (Claude)             │ Intent parsing + PR analysis                     │                                                 │
+│ ├───────────────┼────────────────────────────────────────┼──────────────────────────────────────────────────┤                                                 │
+│ │ GitHub        │ @octokit/rest                          │ PR fetching                                      │                                                 │
+│ ├───────────────┼────────────────────────────────────────┼──────────────────────────────────────────────────┤                                                 │
+│ │ Audio capture │ node-record-lpcm16                     │ Mic streaming                                    │                                                 │
+│ ├───────────────┼────────────────────────────────────────┼──────────────────────────────────────────────────┤                                                 │
+│ │ Secrets       │ keytar (OS keychain)                   │ Secure token storage                             │                                                 │
+│ ├───────────────┼────────────────────────────────────────┼──────────────────────────────────────────────────┤                                                 │
+│ │ Config        │ @nestjs/config + Joi validation        │ Env management                                   │                                                 │
+│ ├───────────────┼────────────────────────────────────────┼──────────────────────────────────────────────────┤                                                 │
+│ │ Events        │ @nestjs/event-emitter                  │ Loose coupling between pipeline stages           │                                                 │
+│ └───────────────┴────────────────────────────────────────┴──────────────────────────────────────────────────┘                                                 │
+│                                                                                                                                                               │
+│ Project Structure                                                                                                                                             │
+│                                                                                                                                                               │
+│ src/                                                                                                                                                          │
+│ ├── main.ts                          # Bootstrap standalone NestJS app                                                                                        │
+│ ├── app.module.ts                    # Root module                                                                                                            │
+│ │                                                                                                                                                             │
+│ ├── common/                                                                                                                                                   │
+│ │   ├── interfaces/                                                                                                                                           │
+│ │   │   ├── skill.interface.ts       # ISkill contract + SkillResult                                                                                          │
+│ │   │   ├── intent.interface.ts      # ParsedIntent types                                                                                                     │
+│ │   │   └── audio-source.interface.ts                                                                                                                         │
+│ │   ├── constants/                                                                                                                                            │
+│ │   │   └── tokens.ts                # Injection tokens                                                                                                       │
+│ │   ├── decorators/                                                                                                                                           │
+│ │   │   └── skill.decorator.ts       # @Skill('github.pr.summary') decorator                                                                                  │
+│ │   └── events/                                                                                                                                               │
+│ │       └── pipeline.events.ts       # Event type constants                                                                                                   │
+│ │                                                                                                                                                             │
+│ ├── config/                                                                                                                                                   │
+│ │   ├── config.module.ts                                                                                                                                      │
+│ │   ├── configuration.ts             # Config factory                                                                                                         │
+│ │   └── config.schema.ts             # Joi validation                                                                                                         │
+│ │                                                                                                                                                             │
+│ ├── secrets/                                                                                                                                                  │
+│ │   ├── secrets.module.ts                                                                                                                                     │
+│ │   └── secrets.service.ts           # Keytar wrapper                                                                                                         │
+│ │                                                                                                                                                             │
+│ ├── audio/                                                                                                                                                    │
+│ │   ├── audio.module.ts                                                                                                                                       │
+│ │   ├── microphone.service.ts        # node-record-lpcm16 wrapper                                                                                             │
+│ │   ├── wake-word.service.ts         # Porcupine integration                                                                                                  │
+│ │   ├── recorder.service.ts          # Post-wake-word capture with silence detection                                                                          │
+│ │   └── audio-pipeline.service.ts    # Orchestrates: wake → record → emit                                                                                     │
+│ │                                                                                                                                                             │
+│ ├── stt/                                                                                                                                                      │
+│ │   ├── stt.module.ts                                                                                                                                         │
+│ │   └── whisper.service.ts           # whisper.cpp local transcription                                                                                        │
+│ │                                                                                                                                                             │
+│ ├── tts/                                                                                                                                                      │
+│ │   ├── tts.module.ts                                                                                                                                         │
+│ │   ├── tts.service.ts               # Orchestrator (Piper → say fallback)                                                                                    │
+│ │   ├── piper-tts.provider.ts        # Piper subprocess wrapper                                                                                               │
+│ │   └── macos-say.provider.ts        # macOS native fallback                                                                                                  │
+│ │                                                                                                                                                             │
+│ ├── intent/                                                                                                                                                   │
+│ │   ├── intent.module.ts                                                                                                                                      │
+│ │   └── intent.service.ts            # Claude-powered intent parser                                                                                           │
+│ │                                                                                                                                                             │
+│ ├── claude/                                                                                                                                                   │
+│ │   ├── claude.module.ts                                                                                                                                      │
+│ │   └── claude.service.ts            # Shared Anthropic SDK client                                                                                            │
+│ │                                                                                                                                                             │
+│ ├── skills/                                                                                                                                                   │
+│ │   ├── skills.module.ts             # Discovers and registers all skills                                                                                     │
+│ │   ├── skill-registry.service.ts    # Maps intent → skill handler                                                                                            │
+│ │   ├── skill-runner.service.ts      # Executes with error handling + timeout                                                                                 │
+│ │   └── github/                                                                                                                                               │
+│ │       ├── github-skill.module.ts                                                                                                                            │
+│ │       ├── github.service.ts        # Octokit wrapper with 5-min PR cache                                                                                    │
+│ │       └── pr-summary.skill.ts      # PR summary skill                                                                                                       │
+│ │                                                                                                                                                             │
+│ └── pipeline/                                                                                                                                                 │
+│     ├── pipeline.module.ts                                                                                                                                    │
+│     └── pipeline.service.ts          # Top-level orchestrator                                                                                                 │
+│                                                                                                                                                               │
+│ Module Architecture                                                                                                                                           │
+│                                                                                                                                                               │
+│ AppModule                                                                                                                                                     │
+│ ├── ConfigModule          (global) — env validation via Joi                                                                                                   │
+│ ├── SecretsModule         (global) — keytar OS keychain                                                                                                       │
+│ ├── ClaudeModule          (global) — shared Anthropic client                                                                                                  │
+│ ├── AudioModule                    — mic, wake word, recorder, pipeline                                                                                       │
+│ ├── SttModule                      — local Whisper transcription                                                                                              │
+│ ├── TtsModule                      — Piper + macOS say                                                                                                        │
+│ ├── IntentModule                   — Claude intent parsing                                                                                                    │
+│ ├── SkillsModule                   — registry + runner + skills                                                                                               │
+│ │   └── GitHubSkillModule          — PR summary                                                                                                               │
+│ └── PipelineModule                 — top-level orchestrator                                                                                                   │
+│                                                                                                                                                               │
+│ Event-Driven Pipeline Flow                                                                                                                                    │
+│                                                                                                                                                               │
+│ AudioPipelineService        PipelineService          External                                                                                                 │
+│        │                          │                     │                                                                                                     │
+│        ├─ wake word detected ────►│                     │                                                                                                     │
+│        ├─ speech captured ───────►│                     │                                                                                                     │
+│        │                          ├─► WhisperService    │                                                                                                     │
+│        │                          ├─► IntentService     │                                                                                                     │
+│        │                          │     (Claude parse)  │                                                                                                     │
+│        │                          ├─► SkillRunner       │                                                                                                     │
+│        │                          │     ├─► GitHub API ─┤                                                                                                     │
+│        │                          │     └─► Claude ─────┤                                                                                                     │
+│        │                          ├─► TtsService        │                                                                                                     │
+│        │                          │     (speaks result) │                                                                                                     │
+│        │◄─ resume listening ──────┤                     │                                                                                                     │
+│                                                                                                                                                               │
+│ State machine: LISTENING → RECORDING → PROCESSING → SPEAKING → LISTENING                                                                                      │
+│                                                                                                                                                               │
+│ Wake word detection pauses during RECORDING and SPEAKING to avoid self-triggering.                                                                            │
+│                                                                                                                                                               │
+│ Key Design Decisions                                                                                                                                          │
+│                                                                                                                                                               │
+│ 1. Skill extensibility: Skills use a @Skill() decorator with metadata (key, description, parameters). The registry auto-discovers them. Adding a new skill =  │
+│ create module + implement ISkill + import. Intent parsing prompt updates automatically from registry.                                                         │
+│ 2. Silence detection for recording: Energy-based VAD (1.5s silence threshold, 10s max) instead of fixed timeout. Avoids cutting off mid-sentence or making    │
+│ user wait.                                                                                                                                                    │
+│ 3. Whisper fallback: whisper-node primary, shell out to whisper.cpp binary as fallback if bindings are unreliable.                                            │
+│ 4. Token resolution: Keychain first → env var fallback → clear error. Setup CLI (npm run setup) for initial keychain storage.                                 │
+│ 5. Single Claude client: Shared across intent parsing and analysis. Centralizes rate limiting, token counting, cost logging.                                  │
+│ 6. Cost optimization: Intent parsing uses Claude Sonnet, max_tokens: 256, temperature: 0 (~$0.001/parse). PR diffs truncated to ~8000 tokens. GitHub data     │
+│ cached 5 minutes.                                                                                                                                             │
+│                                                                                                                                                               │
+│ Build Order                                                                                                                                                   │
+│                                                                                                                                                               │
+│ 1. Scaffolding — package.json, tsconfig, nest-cli, .gitignore, .env.example                                                                                   │
+│ 2. Common types — interfaces, constants, decorators, events                                                                                                   │
+│ 3. Config + Secrets — env validation, keytar wrapper                                                                                                          │
+│ 4. Claude module — Anthropic SDK wrapper                                                                                                                      │
+│ 5. Audio module — mic, wake word, recorder, pipeline (most complex)                                                                                           │
+│ 6. STT module — whisper.service.ts                                                                                                                            │
+│ 7. TTS module — piper + macOS say                                                                                                                             │
+│ 8. Intent module — Claude intent parsing                                                                                                                      │
+│ 9. Skills — registry, runner, GitHub service, PR summary skill                                                                                                │
+│ 10. Pipeline — top-level orchestrator, app.module, main.ts                                                                                                    │
+│                                                                                                                                                               │
+│ Verification                                                                                                                                                  │
+│                                                                                                                                                               │
+│ 1. npm run build — compiles without errors                                                                                                                    │
+│ 2. npm run start — app boots, prints "Ditto is listening..."                                                                                                  │
+│ 3. Say wake word → confirm recording starts (console log)                                                                                                     │
+│ 4. Speak "summarize PR 123 on owner/repo" → confirm transcription (console log)                                                                               │
+│ 5. Confirm intent parsed correctly (console log)                                                                                                              │
+│ 6. Confirm GitHub PR fetched and summary generated                                                                                                            │
+│ 7. Confirm TTS speaks the summary                                                                                                                             │
+│ 8. Confirm wake word resumes after TTS finishes         

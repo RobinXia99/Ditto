@@ -1,0 +1,23 @@
+node_modules/
+dist/
+.env
+package-lock.json
+*.js.map
+*.d.ts
+!nest-cli.json
+
+# Porcupine model files
+*.ppn
+
+# Whisper models
+models/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
