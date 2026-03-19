@@ -5,6 +5,9 @@ export default () => ({
   github: {
     token: process.env.GITHUB_TOKEN,
   },
+  slack: {
+    userToken: process.env.SLACK_USER_TOKEN,
+  },
   picovoice: {
     accessKey: process.env.PICOVOICE_ACCESS_KEY,
   },

@@ -51,7 +51,7 @@ export class ChatSkill implements ISkill, OnModuleInit {
 
     try {
       const answer = await this.llm.chat('analysis', {
-        system: `You are Ditto, a helpful voice assistant for developers. Answer the user's question concisely in 2-4 sentences. Your response will be read aloud, so keep it conversational and natural. Avoid code blocks, bullet points, or markdown — just plain spoken English.`,
+        system: 'You are Ditto, a helpful voice assistant for developers. Answer the user\'s question concisely in 2-4 sentences. Your response will be read aloud, so keep it conversational and natural. Avoid code blocks, bullet points, or markdown — just plain spoken English.',
         messages: [{ role: 'user', content: question }],
         maxTokens: 300,
         temperature: 0.5,
