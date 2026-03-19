@@ -12,6 +12,9 @@ package-lock.json
 # Whisper models
 models/
 
+# Logs
+logs/
+
 # OS
 .DS_Store
 Thumbs.db

@@ -10,7 +10,9 @@
     "start:dev": "nest start --watch",
     "setup": "ts-node src/setup.ts",
     "lint": "eslint \"{src,test}/**/*.ts\"",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start:debug": "LOG_LEVEL=verbose nest start --watch",
+    "start:log": "LOG_LEVEL=verbose nest start --watch 2>&1 | tee logs/ditto-$(date +%Y%m%d-%H%M%S).log"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

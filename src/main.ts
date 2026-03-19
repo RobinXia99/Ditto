@@ -7,8 +7,18 @@ import { Logger } from '@nestjs/common';
 async function bootstrap() {
   const logger = new Logger('Ditto');
 
+  // Map config LOG_LEVEL values to NestJS LogLevel names
+  const levelMap: Record<string, string[]> = {
+    error:   ['error'],
+    warn:    ['error', 'warn'],
+    info:    ['error', 'warn', 'log'],
+    debug:   ['error', 'warn', 'log', 'debug'],
+    verbose: ['error', 'warn', 'log', 'debug', 'verbose'],
+  };
+  const enabledLevels = (levelMap[process.env.LOG_LEVEL || 'debug'] ?? levelMap.debug) as any[];
+
   const app = await NestFactory.createApplicationContext(AppModule, {
-    logger: ['log', 'error', 'warn', 'debug'],
+    logger: enabledLevels,
   });
 
   // Handle shutdown gracefully

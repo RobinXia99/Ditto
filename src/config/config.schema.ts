@@ -36,6 +36,6 @@ export const configValidationSchema = Joi.object({
 
   // Logging
   LOG_LEVEL: Joi.string()
-    .valid('debug', 'info', 'warn', 'error')
+    .valid('error', 'warn', 'info', 'debug', 'verbose')
     .default('debug'),
 });

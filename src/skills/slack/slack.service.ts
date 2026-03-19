@@ -69,7 +69,59 @@ export class SlackService implements OnModuleInit {
     const partial = this.userCache.find(
       (u) => u.name.includes(q) || u.realName.includes(q),
     );
-    return partial || null;
+    if (partial) return partial;
+
+    // Fuzzy match — handles STT misspellings (Eric/Erik, John/Jon, etc.)
+    const fuzzy = this.findFuzzyMatch(q);
+    if (fuzzy) {
+      this.logger.debug(
+        `Fuzzy matched "${query}" → "${fuzzy.realName}" (${fuzzy.name})`,
+      );
+    }
+    return fuzzy;
+  }
+
+  private findFuzzyMatch(query: string): SlackUser | null {
+    let bestMatch: SlackUser | null = null;
+    let bestScore = Infinity;
+
+    for (const user of this.userCache) {
+      const targets = [user.name, user.realName.split(' ')[0]];
+      for (const target of targets) {
+        if (!target) continue;
+        const dist = this.editDistance(query, target);
+        // Allow up to 2 edits for short names, scale for longer ones
+        const maxDist = Math.max(1, Math.floor(target.length / 3));
+        if (dist <= maxDist && dist < bestScore) {
+          bestScore = dist;
+          bestMatch = user;
+        }
+      }
+    }
+
+    return bestMatch;
+  }
+
+  private editDistance(a: string, b: string): number {
+    const m = a.length;
+    const n = b.length;
+    const dp: number[][] = Array.from({ length: m + 1 }, () =>
+      Array(n + 1).fill(0),
+    );
+
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        dp[i][j] =
+          a[i - 1] === b[j - 1]
+            ? dp[i - 1][j - 1]
+            : 1 + Math.min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]);
+      }
+    }
+
+    return dp[m][n];
   }
 
   async sendDm(userId: string, text: string): Promise<void> {
